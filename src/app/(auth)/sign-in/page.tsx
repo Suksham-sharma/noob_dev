@@ -1,6 +1,7 @@
 import { buttonVariants } from "@/components/ui/Button";
+import SignIn from "@/components/SignIn";
 import { cn } from "@/lib/utils";
-import { Link } from "lucide-react";
+import Link from "next/link";
 import { FC } from "react";
 
 const Page: FC = () => {
@@ -18,6 +19,7 @@ const Page: FC = () => {
         </Link>
 
         {/* <SignIn/> */}
+        <SignIn />
       </div>
     </div>
   );
