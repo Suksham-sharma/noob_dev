@@ -15,7 +15,6 @@ const UserAuthForm: FC = () => {
     setIsLoading(true);
 
     try {
-      throw new Error("Not implemented");
       await signIn("google");
     } catch (error) {
       // toast notification
