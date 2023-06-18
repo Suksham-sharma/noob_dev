@@ -1,11 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['uploadthing.com', 'lh3.googleusercontent.com'],
+    dangerouslyAllowSVG: true,
+    domains: [
+      "uploadthing.com",
+      "lh3.googleusercontent.com",
+      "api.dicebear.com",
+    ],
   },
   experimental: {
-    appDir: true
-  }
-}
+    appDir: true,
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
