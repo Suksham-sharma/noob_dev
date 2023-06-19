@@ -1,9 +1,9 @@
 import { buttonVariants } from "@/components/ui/Button";
-import SignIn from "@/components/SignIn";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { FC } from "react";
 import { ChevronLeftIcon } from "lucide-react";
+import SignUp from "@/components/SignUp";
 
 const Page: FC = () => {
   return (
@@ -20,7 +20,7 @@ const Page: FC = () => {
         </Link>
 
         {/* <SignIn/> */}
-        <SignIn />
+        <SignUp />
       </div>
     </div>
   );
