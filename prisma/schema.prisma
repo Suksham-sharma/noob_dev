@@ -52,7 +52,7 @@ model User {
   posts             Post[]
   comments          Comment[]
   sommentVotes      CommentVote[]
-  vote              Vote[]
+  votes             Vote[]
   subscriptions     Subscription[]
   createdSubreddits Subreddit[]    @relation("Createdby")
 }
