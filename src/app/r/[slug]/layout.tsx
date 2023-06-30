@@ -1,3 +1,4 @@
+import CommunityLeaveToggle from "@/components/CommunityLeaveToggle";
 import { Button } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -63,12 +64,12 @@ const Layout = async ({
           {/* info sidebar */}
           <div className="hidden md:block overflow-hidden h-fit rounded-lg border border-gray-400 order-first md:order-last">
             <div className="px-6 py-4">
-              {findSubreddit.createrId === session?.user?.id ? (
-                <div className="flex justify-between gap-x-4">
-                  <p className="font-semibold py-3"> About r/{slug}</p>
-                  <Button>Owner</Button>
-                </div>
-              ) : null}
+              <div className="flex justify-between gap-x-4">
+                <p className="font-semibold py-3"> About r/{slug}</p>
+                {findSubreddit.createrId === session?.user?.id ? (
+                  <Button className="mr-2">Owner</Button>
+                ) : null}
+              </div>
             </div>
 
             <dl className="divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white">
@@ -87,6 +88,14 @@ const Layout = async ({
                   <div className="text-gray-900">{memberCount} members</div>
                 </dd>
               </div>
+
+              {findSubreddit.createrId === session?.user?.id ? null : (
+                <CommunityLeaveToggle
+                  subredditId={findSubreddit.id}
+                  subredditName={findSubreddit.name}
+                  isSubscribed={isSubscribed}
+                />
+              )}
             </dl>
           </div>
         </div>
