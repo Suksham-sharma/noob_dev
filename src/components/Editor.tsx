@@ -1,12 +1,13 @@
 "use client";
 
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { useForm } from "react-hook-form";
 import { PostCreationRequest, postValidator } from "@/lib/validators/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type EditorJS from "@editorjs/editorjs";
-import { pl } from "date-fns/locale";
+import { uploadFiles } from "@/lib/uploadthing";
+import { toast } from "@/hooks/use-toast";
 
 interface EditorProps {
   subredditId: string;
@@ -27,6 +28,14 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
   });
 
   const ref = useRef<EditorJS>();
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const _titleRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMounted(true);
+    }
+  }, []);
 
   const initializeEditor = useCallback(async () => {
     const EditorJS = (await import("@editorjs/editorjs")).default;
@@ -38,7 +47,6 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
     const Code = (await import("@editorjs/code")).default;
     const LinkTool = (await import("@editorjs/link")).default;
     const InlineCode = (await import("@editorjs/inline-code")).default;
-    const style = (await import("editorjs-style")).default;
 
     if (!ref.current) {
       const editor = new EditorJS({
@@ -57,19 +65,85 @@ const Editor: FC<EditorProps> = ({ subredditId }) => {
               endpoint: "/api/fetchLink",
             },
           },
+          image: {
+            class: ImageTool,
+            config: {
+              uploader: {
+                async uploadByFile(file: File) {
+                  const [res] = await uploadFiles([file], "imageUploader");
+
+                  return {
+                    success: 1,
+                    file: {
+                      url: res.fileUrl,
+                    },
+                  };
+                },
+              },
+            },
+          },
+          list: List,
+          code: Code,
+          InlineCode: InlineCode,
+          table: Table,
+          embed: Embed,
         },
       });
     }
   }, []);
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: "Something went wrong",
+          description: (value as { message: string }).message,
+          variant: "destructive",
+        });
+      }
+    }
+  }, [errors]);
+
+  useEffect(() => {
+    const init = async () => {
+      await initializeEditor();
+
+      setTimeout(() => {
+        _titleRef.current?.focus();
+      }, 0);
+    };
+
+    if (isMounted) {
+      init();
+      return () => {
+        ref.current?.destroy();
+        ref.current = undefined;
+      };
+    }
+  }, [isMounted, initializeEditor]);
+
+  const { ref: titleRef, ...rest } = register("title");
+
   return (
     <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200 ">
-      <form id="subreddit-post-form" className=" w-fit" onSubmit={() => {}}>
+      <form
+        id="subreddit-post-form"
+        className=" w-fit"
+        onSubmit={handleSubmit(() => {})}
+      >
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
+            ref={(e) => {
+              titleRef(e);
+
+              // @ts-ignore
+              _titleRef.current = e;
+            }}
+            {...rest}
             placeholder="Title"
             className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
           />
+          <div id="editor" />
         </div>
       </form>
     </div>
