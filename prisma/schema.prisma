@@ -77,6 +77,9 @@ model Subscription {
   userId      String
   subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
+  unsubscribe Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
 
   @@id([userId, subredditId])
 }

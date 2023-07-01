@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { subredditSubscriptionValidator } from "@/lib/validators/subreddit";
 import { z } from "zod";
 
-export async function POST(req: Request) {
+export async function PUT(req: Request) {
   const subscriptions = db.subscription;
 
   try {
@@ -20,26 +20,32 @@ export async function POST(req: Request) {
       where: {
         subredditId: subredditId,
         userId: session.user.id,
+        unsubscribe: false,
       },
     });
 
-    if (findSubscription) {
-      return new Response("Already subscribed", { status: 409 });
+    if (!findSubscription) {
+      return new Response("You are not subscribed", { status: 409 });
     }
 
-    const newSubscription = await subscriptions.create({
+    const Subscription = await subscriptions.update({
+      where: {
+        userId_subredditId: {
+          subredditId: subredditId,
+          userId: session.user.id,
+        },
+      },
       data: {
-        userId: session.user.id,
-        subredditId: subredditId,
+        unsubscribe: true,
       },
     });
 
     return new Response(
       JSON.stringify({
-        message: "Subscription created",
-        subscription: newSubscription,
+        message: "Unsubscribed Successfully",
+        Subscription: Subscription,
       }),
-      { status: 201 }
+      { status: 200 }
     );
   } catch (err) {
     if (err instanceof z.ZodError) {

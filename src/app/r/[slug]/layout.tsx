@@ -1,8 +1,9 @@
 import CommunityLeaveToggle from "@/components/CommunityLeaveToggle";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { format, sub } from "date-fns";
+import { format } from "date-fns";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const Layout = async ({
@@ -38,6 +39,7 @@ const Layout = async ({
           user: {
             id: session.user.id,
           },
+          unsubscribe: false,
         },
       });
 
@@ -50,6 +52,7 @@ const Layout = async ({
       subreddit: {
         name: slug,
       },
+      unsubscribe: false,
     },
   });
 
@@ -96,6 +99,16 @@ const Layout = async ({
                   isSubscribed={isSubscribed}
                 />
               )}
+
+              <Link
+                className={buttonVariants({
+                  variant: "outline",
+                  className: "w-full mb-6",
+                })}
+                href={`/r/${slug}/submit`}
+              >
+                Create Post
+              </Link>
             </dl>
           </div>
         </div>
